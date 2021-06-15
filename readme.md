@@ -9,12 +9,12 @@ Downloding more videos from various sites using Nvd should be totally possible. 
 
 **Disclaimer: This software is only for educational purposes.**
 
-![./image.png](https://raw.githubusercontent.com/yuis-ice/nvd/main/image.png)
+![./image.png](https://raw.githubusercontent.com/gupsevopse/nvd/main/image.png)
 
 ## Build
 
 ```sh
-git clone https://github.com/yuis-ice/nvd.git && cd nvd
+git clone [[this git repo]] && cd nvd
 docker build -t nvd -f nvd.dockerfile .
 ```
 
