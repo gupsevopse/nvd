@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+url="${url}"
+output="${output}"
+# sleep="${sleep:-0}"
+# headless="${headless:-true}"
+# evaluate="${evaluate:-""}"
+
+server="${server:-1}"
+
+if [[ "${server}" == 1 ]];
+then
+  node -e 'console.log(require("moment")().format(), require("chalk").green("getting har file..."));'
+    node nvd.js --url "${url}" --headless true --wait-for-load true
+  node -e 'console.log(require("moment")().format(), require("chalk").green("parsing har file..."));'
+    cat tmp.har |jq '.log.entries[].request | select(.headers[].name == "Sec-Fetch-Dest" and .headers[].value == "video")' > json.tmp
+  node -e 'console.log(require("moment")().format(), require("chalk").green("downloading the video..."));'
+    curl "$(jq -r '.url' json.tmp)" \
+      -H 'Connection: '"$(jq -r '.headers[]|select(.name=="Connection")|.value' json.tmp)" \
+      -H 'User-Agent: '"$(jq -r '.headers[]|select(.name=="User-Agent")|.value' json.tmp)" \
+      -H 'Accept: '"$(jq -r '.headers[]|select(.name=="Accept")|.value' json.tmp)" \
+      -H 'Sec-GPC: '"$(jq -r '.headers[]|select(.name=="Sec-GPC")|.value' json.tmp)" \
+      -H 'Sec-Fetch-Site: '"$(jq -r '.headers[]|select(.name=="Sec-Fetch-Site")|.value' json.tmp)" \
+      -H 'Sec-Fetch-Mode: '"$(jq -r '.headers[]|select(.name=="Sec-Fetch-Mode")|.value' json.tmp)" \
+      -H 'Sec-Fetch-Dest: '"$(jq -r '.headers[]|select(.name=="Sec-Fetch-Dest")|.value' json.tmp)" \
+      -H 'Referer: '"$(jq -r '.headers[]|select(.name=="Referer")|.value' json.tmp)" \
+      -H 'Accept-Language: '"$(jq -r '.headers[]|select(.name=="Accept-Language")|.value' json.tmp)" \
+      -H 'Range: '"$(jq -r '.headers[]|select(.name=="Range")|.value' json.tmp)" \
+      --compressed > "${output}"
+fi
+
+if [[ "${server}" == 2 ]];
+then
+  node -e 'console.log(require("moment")().format(), require("chalk").green("getting har file..."));'
+    node nvd.js --url "${url}" --headless true --selector-to-click 'div.card-header > button:nth-child(3)' --sleep 5
+  node -e 'console.log(require("moment")().format(), require("chalk").green("parsing har file..."));'
+    cat tmp.har |jq '.log.entries[].request | select(.headers[].name == "Sec-Fetch-Dest" and .headers[].value == "video")' > json.tmp
+  node -e 'console.log(require("moment")().format(), require("chalk").green("downloading the video..."));'
+    curl "$(jq -r '.url' json.tmp)" \
+      -H 'Connection: '"$(jq -r '.headers[]|select(.name=="Connection")|.value' json.tmp)" \
+      -H 'User-Agent: '"$(jq -r '.headers[]|select(.name=="User-Agent")|.value' json.tmp)" \
+      -H 'Accept: '"$(jq -r '.headers[]|select(.name=="Accept")|.value' json.tmp)" \
+      -H 'Sec-GPC: '"$(jq -r '.headers[]|select(.name=="Sec-GPC")|.value' json.tmp)" \
+      -H 'Sec-Fetch-Site: '"$(jq -r '.headers[]|select(.name=="Sec-Fetch-Site")|.value' json.tmp)" \
+      -H 'Sec-Fetch-Mode: '"$(jq -r '.headers[]|select(.name=="Sec-Fetch-Mode")|.value' json.tmp)" \
+      -H 'Sec-Fetch-Dest: '"$(jq -r '.headers[]|select(.name=="Sec-Fetch-Dest")|.value' json.tmp)" \
+      -H 'Referer: '"$(jq -r '.headers[]|select(.name=="Referer")|.value' json.tmp)" \
+      -H 'Accept-Language: '"$(jq -r '.headers[]|select(.name=="Accept-Language")|.value' json.tmp)" \
+      -H 'Range: '"$(jq -r '.headers[]|select(.name=="Range")|.value' json.tmp)" \
+      --compressed > "${output}"
+fi
+
+# node -e 'console.log(require("moment")().format(), require("chalk").green("cleaning up files..."));'
+# rm json.tmp tmp.har
